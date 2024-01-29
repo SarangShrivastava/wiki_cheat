@@ -1,11 +1,10 @@
-# wiki_cheat
+# wiki_cheat application 
 
 Link to the video - https://www.loom.com/share/b64de62586284a87adf23a83c697415d?sid=a8053b53-60fe-4a7f-8fe1-26e68177fcdd 
 
-Hello Everyone,
+# Talk Track
 
 Today we will go over the details of an application that is called WikiCheat. Users can ask questions to this application and app will answer the question, produce an evidence wiki passage that contains the answer and also produce a wikipedia link. The code is mostly organized in python notebooks and more emphasis is given to the overall modelling exercise.
-
 
 Now lets directly jump to the app and run it across a bunch of queries. The overall architecture is divided into 3 major parts.
 
@@ -17,14 +16,14 @@ The retriever module takes in the user query and fetches the 100 most relevant r
 
 As you might see, the model works in most of the cases barring some. This is still a proof of concept and requires a lot of enhancements and improvements to productionize it.
 
-2) Datasets
+## Datasets
 
 There are a bunch of public datasets that we can leverage here. We end up using a combination
 
 1) wikiQA - Has close to 3000 question and passage pairs
 2) wikipedia- 22-12-small- It has About 100k wikipedia articles divided into ~485k passages. We generate a question for 10,000 passages taken, each taken from a different article using Mistral 7B Instruct v0.2 model which was recently released by Mistral AI.
 
-3) Generate Training data
+## Generate Training data
 
 We are working on a A10 Nvidia GPU node which has 24GB of GPU memory. We were able to load the Mistral 7B model in bf16 precision but it was roughly taking 1 min to generate 5 question and answer pairs.
 
@@ -37,7 +36,7 @@ It took about 1 Dollar on their platform to generate this synthetic dataset.
 
 We could have further increased the difficulty by sending in multiple passages from the same article and then asking it to generate a question which would involve multi hop reasoning across passages. And the same could be extended at an article level as well. For this exercise, we are generating a simple question
 
-3) Encode and Upload
+## Encode and Upload
 
 I explored both Qdrant and Pinecone to store our embeddings. We could have used ann libs like faiss or scann, but creating multiple indexes on my local machine with 500k dps would have slowed down the experiment cycle. Hence I stuck to using the hosted versions of Qdrant and Pinecone. Qdrant in its free tier provides a small machine which has 1GB of RAM. I was not able to index the complete 500k passages on their free tier.
 
@@ -45,7 +44,7 @@ Pinecone serverless seemed to be a good choice for me because they were offerrin
 
 It took about 20 mins to upload and create the index. I would have loved to explore and experiment with the vector store more. tinkering around with the indexing algorithm, tune the retrieval based on latency v/s recall, etc but due to limited time, that is out of scope for this exercise.
 
-4) Pipeline experiments
+## Pipeline experiments
 
 Now Lets look at some experiments that we did to produce our pipeline.
 
@@ -82,7 +81,7 @@ This could be because of multiple reasons.
 2) The prompting techniques could be improved. We could use Chain of thought prompting with in context learning. We can also randomly shuffle the reranked options and do multiple runs across all of them and take a majority vote. This was recently introduced in the med prompt paper where authors showed that sometimes, LLMs are biased towards a particular option when they are presented multiple choice question.
 3) A more in depth qualitative analysis would provide more details. From the initial looks of it, there are some instances where the passage chosen by the LLM is also correct. Now this could be attributed to the way we have generated our synthetic dataset. We are generating 1 question for 1 passage from an article. In this process we are not forcing the model to generate a question whose answer could only be found in the given passage but cannot be found in the other passages. This is also something that I would love to explore further.
 
-5) train_embedder.ipynb
+## Train Embedder
 
 Now lets look at some experiments that we did to fine tune our embedder model. Due to limited time, we did not perform an exhaustive search for the hyper parameters, loss function, learning rate, drop out etc. We are using the default learning rate of 2e-5 with a weight decay of 0.1.
 
@@ -102,7 +101,39 @@ If we just append the title in the passage text and keep the other configuration
 
 Given a larger GPU and more time, we can perform much more elaborate experiments.
 
-wiki_cheat limitations
+## Future Improvements
+
+### Query Reformulation and Dataset generation
+#### 1. We can rewrite the users queries and further decompose them to find answers that could be present 
+####    across multiple passages and articles.
+#### 2. We can generate a synthetic dataset that requires the model to perform multi hop reasoning
+#### 3. We can generate a much larger dataset.
+#### 4. There could be other interesting ways of chunking the wikipedia articles, instead of just using passages. 
+####    We can keep an overlap between multiple passages to further enhance context. 
+
+### RAG pipeline
+#### 1. We can introduce an augment step where we can generate a set of questions that need to be answered first
+####    in order to find the answer to the original question
+#### 2. Instead of showing the complete paragraph as the evidence, we can show the exact part of the paragraph which 
+####    contains the answer 
+#### 3. In the reader stage, instead of sending in 10 passages from k different articles, we can send all passages 
+####    of these k different articles to provide a better context to the LLM
+#### 4. We could find the embeddings of the entire wikipedia article and store them in our vector store. We then 
+####    use a 2-step process to first narrow down on the correct article and then narrow down on the right passage 
+####    in that article.
+
+### Modelling
+#### 1. Experiments with other Embedding models, loss functions, exhaustive hyper-parameter search
+#### 2. Benchmarking using other commercial embedders. Ex - OpenAI just released their new v3 embedding model
+#### 3. We can parse the wikipedia articles, extract their headings and use the section hierarchy to enhance the 
+####    context of the passages.
+#### 4. Instead of using the encoder based models for generating sentence embeddings, we can use an LLM(a decoder only)
+####    to generate embeddings. There is a e5-mistral-7b-instruct model which was trained in this manner and is sitting
+####    top of the embedding benchmarks
+#### 5. We can use instruction fine tune a smaller LLM like phi-2 to perform the reader task instead of using GPT-4 there. 
+
+### This field is evolving at such a rapid pace that, we are bombarded with new ideas and content every other day. 
+### So lets keep our heads down, learn from the community and keep growing. Thank you. 
 
 
 
