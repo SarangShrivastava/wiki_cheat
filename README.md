@@ -101,39 +101,28 @@ If we just append the title in the passage text and keep the other configuration
 
 Given a larger GPU and more time, we can perform much more elaborate experiments.
 
-## Future Improvements
+## Some Future Improvement Ideas to work on
 
 ### Query Reformulation and Dataset generation
-#### 1. We can rewrite the users queries and further decompose them to find answers that could be present 
-####    across multiple passages and articles.
-#### 2. We can generate a synthetic dataset that requires the model to perform multi hop reasoning
-#### 3. We can generate a much larger dataset.
-#### 4. There could be other interesting ways of chunking the wikipedia articles, instead of just using passages. 
-####    We can keep an overlap between multiple passages to further enhance context. 
+1. We can rewrite the users queries and further decompose them to find answers that could be present across multiple passages and articles.
+2. We can generate a synthetic dataset that requires the model to perform multi hop reasoning
+3. We can generate a much larger dataset.
+4. There could be other interesting ways of chunking the wikipedia articles, instead of just using passages. We can keep an overlap between multiple passages to further enhance context. 
 
 ### RAG pipeline
-#### 1. We can introduce an augment step where we can generate a set of questions that need to be answered first
-####    in order to find the answer to the original question
-#### 2. Instead of showing the complete paragraph as the evidence, we can show the exact part of the paragraph which 
-####    contains the answer 
-#### 3. In the reader stage, instead of sending in 10 passages from k different articles, we can send all passages 
-####    of these k different articles to provide a better context to the LLM
-#### 4. We could find the embeddings of the entire wikipedia article and store them in our vector store. We then 
-####    use a 2-step process to first narrow down on the correct article and then narrow down on the right passage 
-####    in that article.
+1. We can introduce an augment step where we can generate a set of questions that need to be answered first in order to find the answer to the original question
+2. Instead of showing the complete paragraph as the evidence, we can show the exact part of the paragraph which contains the answer 
+3. In the reader stage, instead of sending in 10 passages from k different articles, we can send all passages of these k different articles to provide a better context to the LLM
+4. We could find the embeddings of the entire wikipedia article and store them in our vector store. We then use a 2-step process to first narrow down on the correct article and then narrow down on the right passage in that article.
 
 ### Modelling
-#### 1. Experiments with other Embedding models, loss functions, exhaustive hyper-parameter search
-#### 2. Benchmarking using other commercial embedders. Ex - OpenAI just released their new v3 embedding model
-#### 3. We can parse the wikipedia articles, extract their headings and use the section hierarchy to enhance the 
-####    context of the passages.
-#### 4. Instead of using the encoder based models for generating sentence embeddings, we can use an LLM(a decoder only)
-####    to generate embeddings. There is a e5-mistral-7b-instruct model which was trained in this manner and is sitting
-####    top of the embedding benchmarks
-#### 5. We can use instruction fine tune a smaller LLM like phi-2 to perform the reader task instead of using GPT-4 there. 
+1. Experiments with other Embedding models, loss functions, exhaustive hyper-parameter search
+2. Benchmarking using other commercial embedders. Ex - OpenAI just released their new v3 embedding model
+3. We can parse the wikipedia articles, extract their headings and use the section hierarchy to enhance the context of the passages.
+4. Instead of using the encoder based models for generating sentence embeddings, we can use an LLM(a decoder only) to generate embeddings. There is a e5-mistral-7b-instruct model which was trained in this manner and is sitting top of the embedding benchmarks
+5. We can use instruction fine tune a smaller LLM like phi-2 to perform the reader task instead of using GPT-4 there. 
 
-### This field is evolving at such a rapid pace that, we are bombarded with new ideas and content every other day. 
-### So lets keep our heads down, learn from the community and keep growing. Thank you. 
+This field is evolving at such a rapid pace that, we are bombarded with new ideas and content every other day. So lets keep our heads down, learn from the community and keep growing. Thank you. 
 
 
 
